@@ -14,16 +14,16 @@ sheets_auth(email = gdriveuser)
 
 # Starting with the most recent pull
 # Crowdy20191203_Data_Cleaned
-#crowdyid <- "1Nw79vxKjTTDp-0ots3wwZoq4NV5Y2wx4cNZk_9vW7KE"
-#deploystamp <- "Crowdy20191203"
+crowdyid <- "1Nw79vxKjTTDp-0ots3wwZoq4NV5Y2wx4cNZk_9vW7KE"
+deploystamp <- "Crowdy20191203"
 
 # deployed20180928
 #crowdyid <- "1UeJjCead3qXnKQecQVoJ2vrP0kf0r6zoIph4LTDY5RU"
 #deploystamp <- "20180928"
 
 # deployed20180612
-crowdyid <- "1lChv7Tdgi5nBXIXiIlblK7dNF1SGxRsz9qdtFVzQSN4"
-deploystamp <- "20180612"
+#crowdyid <- "1lChv7Tdgi5nBXIXiIlblK7dNF1SGxRsz9qdtFVzQSN4"
+#deploystamp <- "20180612"
 
 crowdy_data <- read_sheet(crowdyid, col_types = "c", na = c("", "NA")) # slow
 
@@ -75,13 +75,13 @@ second <- crowdy_cnts %>%
 # no third counts for 20180928 or 20180612 deployments
 third <- crowdy_cnts %>%
   filter(!is.na(VehicCount3)) %>%
-  mutate(#CntDate = if_else(!is.na(CntDate3), CntDate3, CntDate),
+  mutate(CntDate = if_else(!is.na(CntDate3), CntDate3, CntDate),
          CntTime = CntTime3,
          VehicCount = VehicCount3) %>%
   select(to, CntDate, CntTime, VehicCount)
 
 # bind em together
-counts <- bind_rows(first, second)#, third)
+counts <- bind_rows(first, second, third)
 
 ## Now use the joinkey to convert phone numbers to trails
 th_joinkey <- th_info %>%
@@ -101,10 +101,9 @@ counts_tr
 #### Pull out data on party people, party vehicles, and how long for parking model
 # (note that there is no "HowLong" question in the 20180612 deployment)
 trips <- crowdy_wide %>%
-  select(from, to, date, CntDate, #HowLong, 
+  select(from, to, date, CntDate, HowLong, 
          PartyPeople, PartyVehics) %>%
-  filter(!(#is.na(HowLong) & 
-             is.na(PartyPeople) & is.na(PartyVehics))) 
+  filter(!(is.na(HowLong) & is.na(PartyPeople) & is.na(PartyVehics))) 
 
 # bind on to trails & remove phone numbers
 trips_tr <- trips %>%
