@@ -7,6 +7,8 @@ library(googlesheets4)
 library(lubridate)
 
 setwd("~/Documents/Crowdy/")
+gdriveuser <- "sgwinder@uw.edu"
+sheets_auth(email = gdriveuser)
 
 # change id and deploystamp depending on which set of data you are working from
 
@@ -16,8 +18,12 @@ setwd("~/Documents/Crowdy/")
 #deploystamp <- "Crowdy20191203"
 
 # deployed20180928
-crowdyid <- "1UeJjCead3qXnKQecQVoJ2vrP0kf0r6zoIph4LTDY5RU"
-deploystamp <- "20180928"
+#crowdyid <- "1UeJjCead3qXnKQecQVoJ2vrP0kf0r6zoIph4LTDY5RU"
+#deploystamp <- "20180928"
+
+# deployed20180612
+crowdyid <- "1lChv7Tdgi5nBXIXiIlblK7dNF1SGxRsz9qdtFVzQSN4"
+deploystamp <- "20180612"
 
 crowdy_data <- read_sheet(crowdyid, col_types = "c", na = c("", "NA")) # slow
 
@@ -27,7 +33,8 @@ th_info <- read_sheet(joinid, sheet = "Crowdsource Parking Lot Counts TH")
 
 # What I need is a "convo" id. But figuring out how to do that is tricky...
 # I suppose a relatively good method is to group by "to", "from", and "date"
-# Note that this led me to identify a bunch of issues that I fixed row by row in the googlesheet
+# Note that this led me to identify a bunch of issues (by errors that keys were shared)
+# that I fixedrow by row in the googlesheet.
 ## When a question was asked twice, I assigned the second value to be an NA
 # spread data 
 
@@ -39,7 +46,7 @@ crowdy_wide <- no_nas %>%
   select(bodyclean, lastquestion, from, to, date) %>%
   #rowid_to_column() %>%
   spread(key = lastquestion, value = bodyclean)
-
+crowdy_wide
 ## TODO: Figure out how to combine rows for convos that went on for more than one day.
 ##  There are some (unsuccessful) attempts at this at the end of the script 
 
@@ -57,15 +64,15 @@ first <- crowdy_cnts %>%
   filter(!is.na(VehicCount))
 first
 
-# note that CntDate is commented out here because the 20180928 Deployment had no CntDate2
+# note that CntDate is commented out for the 20180928 Deployment, which had no CntDate2
 second <- crowdy_cnts %>%
   filter(!is.na(VehicCount2)) %>%
-  mutate(#CntDate = if_else(!is.na(CntDate2), CntDate2, CntDate),
+  mutate(CntDate = if_else(!is.na(CntDate2), CntDate2, CntDate),
          CntTime = CntTime2,
          VehicCount = VehicCount2) %>%
   select(to, CntDate, CntTime, VehicCount)
 
-# no third counts for 20180928 deployment
+# no third counts for 20180928 or 20180612 deployments
 third <- crowdy_cnts %>%
   filter(!is.na(VehicCount3)) %>%
   mutate(#CntDate = if_else(!is.na(CntDate3), CntDate3, CntDate),
@@ -92,9 +99,12 @@ counts_tr
 #write_csv(counts_tr, paste0("data/Parking_Counts_", deploystamp, ".csv"))
 
 #### Pull out data on party people, party vehicles, and how long for parking model
+# (note that there is no "HowLong" question in the 20180612 deployment)
 trips <- crowdy_wide %>%
-  select(from, to, date, CntDate, HowLong, PartyPeople, PartyVehics) %>%
-  filter(!(is.na(HowLong) & is.na(PartyPeople) & is.na(PartyVehics))) 
+  select(from, to, date, CntDate, #HowLong, 
+         PartyPeople, PartyVehics) %>%
+  filter(!(#is.na(HowLong) & 
+             is.na(PartyPeople) & is.na(PartyVehics))) 
 
 # bind on to trails & remove phone numbers
 trips_tr <- trips %>%
@@ -103,7 +113,7 @@ trips_tr <- trips %>%
 trips_tr
 
 # write it out
-write_csv(trips_tr, paste0("data/Trips_info_", deploystamp, ".csv"))
+#write_csv(trips_tr, paste0("data/Trips_info_", deploystamp, ".csv"))
 
 
 ############ Old ###########
