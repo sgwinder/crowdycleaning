@@ -8,7 +8,10 @@ library(lubridate)
 
 # Starting with the most recent pull
 # Crowdy20191203_Data_Cleaned
+# change id and deploystamp depending on which set of data you are working from
 crowdyid <- "1Nw79vxKjTTDp-0ots3wwZoq4NV5Y2wx4cNZk_9vW7KE"
+deploystamp <- "Crowdy20191203"
+
 crowdy_data <- read_sheet(crowdyid, col_types = "c", na = c("", "NA")) # slow
 
 # Also pull in a joinkey to get phone numbers to trails
@@ -65,7 +68,7 @@ crowdy_wide %>%
 #### Meh. Let's leave it for now - the to, from, date grouping should be good enough
 
 # write out crowdy_wide
-#write_csv(crowdy_wide, "convos_20191203.csv")
+#write_csv(crowdy_wide, paste0("Convos_", deploystamp, ".csv"))
 
 #### Parse and clean counts
 crowdy_cnts <- crowdy_wide %>%
@@ -108,7 +111,7 @@ counts_tr <- counts %>%
 
 counts_tr
 # write it out
-#write_csv(counts_tr, "~/Documents/Crowdy/Parking_Counts_Crowdy20191203.csv")
+#write_csv(counts_tr, paste0("~/Documents/Crowdy/Parking_Counts_", deploystamp, ".csv"))
 
 #### Pull out data on party people, party vehicles, and how long for parking model
 trips <- crowdy_wide %>%
@@ -121,4 +124,4 @@ trips_tr <- trips %>%
   select(-from, -to)
 
 # write it out
-#write_csv(trips_tr, "Trips_info_crowdy20191203.csv")
+#write_csv(trips_tr, paste0("Trips_info_", deploystamp, ".csv"))
