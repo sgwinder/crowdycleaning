@@ -1,6 +1,16 @@
 ####
-#### Parsing Crowdy Parking Lot Counts
-####
+#### Munging Clean Crowdy Data
+#### March, 2020
+#### Use this script to convert manually cleaned dumb crowdy data into convos, parking lot counts, 
+####   and trip data (how long, how many people/party and /veh) 
+#### 
+#### Inputs: CrowdyDDDD_Data_Cleaned from google drive. These are long form spreadsheets of data 
+####           which have been parsed using `parse_sms_surveys.r`, then manually cleaned by a tech,
+####           following the protocols in "Crowdy Cleaning Instructions and Formatting" on the team drive
+#### Outputs:
+####    Convos_deploystamp.csv - a wide form dataset of conversations (assuming that all convos happen on a single day)
+####    Parking_counts_deploystamp.csv - a long form dataset of parking lot counts only
+####    Trips_info_deploystamp.csv - Info on trip length, number of people in party, and number of vehicles in party
 
 library(tidyverse)
 library(googlesheets4)
@@ -34,7 +44,7 @@ th_info <- read_sheet(joinid, sheet = "Crowdsource Parking Lot Counts TH")
 # What I need is a "convo" id. But figuring out how to do that is tricky...
 # I suppose a relatively good method is to group by "to", "from", and "date"
 # Note that this led me to identify a bunch of issues (by errors that keys were shared)
-# that I fixedrow by row in the googlesheet.
+# that I fixed row by row in the googlesheet.
 ## When a question was asked twice, I assigned the second value to be an NA
 # spread data 
 
